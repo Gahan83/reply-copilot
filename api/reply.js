@@ -15,6 +15,7 @@ function buildPrompt({ tone, voice, from, rel, incoming }) {
     warm: "Warm, friendly, human. Natural idioms. Not gushy.",
     brief: "Short and blunt. One or two lines max. No fluff.",
     formal: "Polite and professional, but not stiff.",
+    idiom: "Lean on everyday idioms and colloquial turns of phrase. Keep them natural and common — no forced or dated expressions.",
   }[tone] || "Warm, friendly, human.";
 
   const system = `You draft WhatsApp replies on behalf of a user. You never send — you only propose one reply for the user to approve.

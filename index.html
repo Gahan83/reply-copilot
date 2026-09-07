@@ -54,11 +54,6 @@
     margin: 0;
     letter-spacing: -0.3px;
   }
-  .tagline {
-    font-size: 12px;
-    color: var(--accent);
-    font-weight: 600;
-  }
   .sub {
     color: var(--muted);
     font-size: 13.5px;
@@ -169,8 +164,6 @@
     gap: 10px;
     flex-wrap: wrap;
   }
-  .samples { display: flex; gap: 6px; flex-wrap: wrap; }
-  .samples .ghost { padding: 4px 10px; font-size: 12px; }
 
   .two-col { display: flex; gap: 10px; margin-bottom: 10px; }
   .two-col .col1 { flex: 1; }
@@ -230,7 +223,7 @@
       <div class="voice-body" id="voiceBody">
         <div class="chips" id="tones"></div>
         <label class="field-label" for="voice">Paste 3–5 of your own past texts so it learns how you actually write (optional)</label>
-        <textarea class="field" id="voice" rows="4" placeholder="ya done, will push in 5&#10;haha no worries take your time&#10;Appa I'll call after standup, mid of a deploy"></textarea>
+        <textarea class="field" id="voice" rows="4"></textarea>
       </div>
     </section>
 
@@ -242,15 +235,15 @@
       <div class="two-col">
         <div class="col1">
           <label class="field-label" for="from">From</label>
-          <input class="field no-resize" id="from" placeholder="e.g. Anna" />
+          <input class="field no-resize" id="from" />
         </div>
         <div class="col2">
           <label class="field-label" for="rel">Who they are to you</label>
-          <input class="field no-resize" id="rel" placeholder="e.g. elder brother" />
+          <input class="field no-resize" id="rel" />
         </div>
       </div>
       <label class="field-label" for="incoming">Their message</label>
-      <textarea class="field" id="incoming" rows="3" placeholder="Paste what they sent you…"></textarea>
+      <textarea class="field" id="incoming" rows="3"></textarea>
       <button class="btn full-btn" id="generate">Draft a reply</button>
       <p class="err hidden" id="error"></p>
     </section>
@@ -283,6 +276,7 @@
     { id: "warm", label: "Warm", hint: "" },
     { id: "brief", label: "Short & blunt", hint: "" },
     { id: "formal", label: "Formal", hint: "" },
+    { id: "idiom", label: "Idiom", hint: "leans on everyday idioms and turns of phrase" },
   ];
 
   // ── state ─────────────────────────────────────────────────

@@ -5,5 +5,8 @@
   "description": "Human-in-the-loop WhatsApp reply drafter. Drafts a reply in your voice; you approve before anything sends.",
   "engines": {
     "node": ">=18"
+  },
+  "scripts": {
+    "dev": "node server.js"
   }
 }
