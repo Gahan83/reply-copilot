@@ -1,0 +1,9 @@
+{
+  "name": "reply-copilot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Human-in-the-loop WhatsApp reply drafter. Drafts a reply in your voice; you approve before anything sends.",
+  "engines": {
+    "node": ">=18"
+  }
+}

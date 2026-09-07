@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0e1216" />
+<title>Reply co-pilot</title>
+<style>
+  :root {
+    --bg: #0e1216;
+    --surface: #161c22;
+    --surface2: #1c242c;
+    --border: #28323c;
+    --border-soft: #212a33;
+    --text: #e7ecf1;
+    --muted: #8a97a5;
+    --faint: #5c6874;
+    --accent: #3ecf8e;
+    --accent-dim: #1f5c43;
+    --amber: #e0a458;
+    --danger: #e0685f;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  .wrap {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 28px 18px 40px;
+  }
+
+  /* header */
+  .head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.3px;
+  }
+  .tagline {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .sub {
+    color: var(--muted);
+    font-size: 13.5px;
+    margin: 0 0 22px;
+    line-height: 1.5;
+  }
+
+  section {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+  section.pad { padding: 16px; }
+
+  .sec-title { font-size: 14px; font-weight: 600; }
+
+  /* collapsible voice header */
+  .voice-toggle {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    padding: 14px 16px;
+    cursor: pointer;
+    font: inherit;
+  }
+  .voice-toggle .hint { font-size: 12px; color: var(--faint); }
+  .voice-body { padding: 0 16px 16px; }
+
+  label.field-label {
+    font-size: 12px;
+    color: var(--faint);
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 500;
+  }
+
+  .field {
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+    resize: vertical;
+  }
+  .field:focus { border-color: var(--accent-dim); }
+  .field.no-resize { resize: none; }
+  textarea.field { min-height: 44px; }
+
+  /* buttons */
+  .btn {
+    background: var(--accent);
+    color: #08120d;
+    border: none;
+    border-radius: 10px;
+    padding: 9px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn:disabled { opacity: 0.8; cursor: default; }
+  .ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* tone chips */
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chip {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .chip.active {
+    color: var(--accent);
+    border-color: var(--accent-dim);
+    background: #122019;
+  }
+
+  /* incoming header row */
+  .row-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .samples { display: flex; gap: 6px; flex-wrap: wrap; }
+  .samples .ghost { padding: 4px 10px; font-size: 12px; }
+
+  .two-col { display: flex; gap: 10px; margin-bottom: 10px; }
+  .two-col .col1 { flex: 1; }
+  .two-col .col2 { flex: 1.4; }
+
+  .full-btn { margin-top: 14px; width: 100%; }
+
+  .err { color: var(--danger); font-size: 13px; margin: 10px 0 0; }
+
+  /* draft */
+  .draft { background: var(--surface2); border: 1px solid var(--border); }
+  .draft.approved {
+    border-color: var(--accent-dim);
+    box-shadow: 0 0 0 1px var(--accent-dim);
+  }
+  .draft-status { font-size: 12px; font-weight: 600; color: var(--amber); }
+  .draft.approved .draft-status { color: var(--accent); }
+  .draft-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .draft textarea { background: var(--bg); font-size: 15px; line-height: 1.5; }
+  .draft-note { color: var(--faint); font-size: 12px; margin: 12px 0 0; line-height: 1.5; }
+
+  .foot {
+    color: var(--faint);
+    font-size: 11.5px;
+    text-align: center;
+    margin-top: 24px;
+    line-height: 1.5;
+  }
+
+  .hidden { display: none !important; }
+
+  /* mobile */
+  @media (max-width: 480px) {
+    .wrap { padding: 20px 14px 32px; }
+    h1 { font-size: 20px; }
+    .two-col { flex-direction: column; gap: 10px; }
+    .btn, .ghost { padding: 11px 16px; }   /* bigger tap targets */
+    .draft-actions .btn, .draft-actions .ghost { flex: 1; text-align: center; }
+    .row-between { align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="head">
+      <h1>Reply co-pilot</h1>
+    </div>
+    <p class="sub">A message comes in, you get one drafted reply in your voice. Nothing leaves until you approve it.</p>
+
+    <!-- voice profile -->
+    <section>
+      <button class="voice-toggle" id="voiceToggle" aria-expanded="true">
+        <span class="sec-title">Your voice</span>
+        <span class="hint" id="voiceHint">hide</span>
+      </button>
+      <div class="voice-body" id="voiceBody">
+        <div class="chips" id="tones"></div>
+        <label class="field-label" for="voice">Paste 3–5 of your own past texts so it learns how you actually write (optional)</label>
+        <textarea class="field" id="voice" rows="4" placeholder="ya done, will push in 5&#10;haha no worries take your time&#10;Appa I'll call after standup, mid of a deploy"></textarea>
+      </div>
+    </section>
+
+    <!-- incoming -->
+    <section class="pad">
+      <div class="row-between">
+        <span class="sec-title">Incoming message</span>
+      </div>
+      <div class="two-col">
+        <div class="col1">
+          <label class="field-label" for="from">From</label>
+          <input class="field no-resize" id="from" placeholder="e.g. Anna" />
+        </div>
+        <div class="col2">
+          <label class="field-label" for="rel">Who they are to you</label>
+          <input class="field no-resize" id="rel" placeholder="e.g. elder brother" />
+        </div>
+      </div>
+      <label class="field-label" for="incoming">Their message</label>
+      <textarea class="field" id="incoming" rows="3" placeholder="Paste what they sent you…"></textarea>
+      <button class="btn full-btn" id="generate">Draft a reply</button>
+      <p class="err hidden" id="error"></p>
+    </section>
+
+    <!-- draft -->
+    <section class="pad draft hidden" id="draftBox">
+      <div class="row-between" style="margin-bottom:10px;">
+        <span class="sec-title" id="draftTitle">Draft (edit anything)</span>
+        <span class="draft-status" id="draftStatus">● waiting on you</span>
+      </div>
+      <textarea class="field" id="draft" rows="3"></textarea>
+      <div class="draft-actions">
+        <button class="btn" id="approveBtn">Approve</button>
+        <button class="ghost" id="regenBtn">Regenerate</button>
+      </div>
+      <p class="draft-note hidden" id="draftNote"></p>
+    </section>
+
+    <p class="foot">Human-in-the-loop by design. It reads and suggests — you're always the one who hits send.</p>
+  </div>
+
+<script>
+  // ── config ────────────────────────────────────────────────
+  // Frontend calls YOUR backend, never Anthropic directly.
+  // On Vercel this maps to /api/reply.js (serverless function).
+  const API_URL = "/api/reply";
+
+  const TONES = [
+    { id: "me", label: "Like me", hint: "learns from your samples below" },
+    { id: "warm", label: "Warm", hint: "" },
+    { id: "brief", label: "Short & blunt", hint: "" },
+    { id: "formal", label: "Formal", hint: "" },
+  ];
+
+  // ── state ─────────────────────────────────────────────────
+  let tone = "me";
+  let approved = false;
+  let loading = false;
+
+  // ── els ───────────────────────────────────────────────────
+  const $ = (id) => document.getElementById(id);
+  const el = {
+    voiceToggle: $("voiceToggle"), voiceHint: $("voiceHint"), voiceBody: $("voiceBody"),
+    tones: $("tones"), voice: $("voice"),
+    from: $("from"), rel: $("rel"), incoming: $("incoming"),
+    generate: $("generate"), error: $("error"),
+    draftBox: $("draftBox"), draftTitle: $("draftTitle"), draftStatus: $("draftStatus"),
+    draft: $("draft"), approveBtn: $("approveBtn"), regenBtn: $("regenBtn"), draftNote: $("draftNote"),
+  };
+
+  // ── build tone chips ──────────────────────────────────────
+  TONES.forEach((t) => {
+    const b = document.createElement("button");
+    b.className = "chip" + (t.id === tone ? " active" : "");
+    b.textContent = t.label;
+    if (t.hint) b.title = t.hint;
+    b.onclick = () => {
+      tone = t.id;
+      [...el.tones.children].forEach((c, i) => c.classList.toggle("active", TONES[i].id === tone));
+    };
+    el.tones.appendChild(b);
+  });
+
+  // ── voice collapse ────────────────────────────────────────
+  let showVoice = true;
+  el.voiceToggle.onclick = () => {
+    showVoice = !showVoice;
+    el.voiceBody.classList.toggle("hidden", !showVoice);
+    el.voiceHint.textContent = showVoice ? "hide" : "edit";
+    el.voiceToggle.setAttribute("aria-expanded", String(showVoice));
+  };
+
+  // ── helpers ───────────────────────────────────────────────
+  function setApproved(v) {
+    approved = v;
+    el.draftBox.classList.toggle("approved", v);
+    el.draftTitle.textContent = v ? "Approved — ready to send" : "Draft (edit anything)";
+    el.draftStatus.textContent = v ? "✓ you okayed this" : "● waiting on you";
+    el.approveBtn.textContent = v ? "Copy to send" : "Approve";
+    if (v) {
+      el.draftNote.textContent = "In the real setup this is the point where Baileys sends it to "
+        + (el.from.value || "them") + ". Here, it's on your clipboard.";
+      el.draftNote.classList.remove("hidden");
+    } else {
+      el.draftNote.classList.add("hidden");
+    }
+  }
+
+  function setLoading(v) {
+    loading = v;
+    el.generate.disabled = v;
+    el.regenBtn.disabled = v;
+    el.generate.textContent = v ? "Drafting…" : "Draft a reply";
+    el.generate.style.background = v ? "var(--accent-dim)" : "var(--accent)";
+  }
+
+  // ── generate ──────────────────────────────────────────────
+  async function generate() {
+    const incoming = el.incoming.value.trim();
+    if (!incoming) {
+      el.error.textContent = "Paste an incoming message first.";
+      el.error.classList.remove("hidden");
+      return;
+    }
+    setLoading(true);
+    el.error.classList.add("hidden");
+    setApproved(false);
+    el.draftBox.classList.add("hidden");
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tone,
+          voice: el.voice.value.trim(),
+          from: el.from.value.trim(),
+          rel: el.rel.value.trim(),
+          incoming,
+        }),
+      });
+      if (!res.ok) {
+        let msg = "Couldn't reach the model.";
+        try { const j = await res.json(); if (j.error) msg = j.error; } catch (_) {}
+        throw new Error(msg);
+      }
+      const data = await res.json();
+      const text = (data.reply || "").trim();
+      if (!text) throw new Error("Empty response");
+      el.draft.value = text;
+      el.draftBox.classList.remove("hidden");
+      setApproved(false);
+      el.draftBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } catch (e) {
+      el.error.textContent = e.message || "Something went wrong. Try again.";
+      el.error.classList.remove("hidden");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  el.generate.onclick = generate;
+  el.regenBtn.onclick = generate;
+
+  el.draft.oninput = () => setApproved(false);
+  el.incoming.oninput = () => { if (approved) setApproved(false); };
+
+  el.approveBtn.onclick = () => {
+    if (!approved) {
+      setApproved(true);
+    } else {
+      navigator.clipboard?.writeText(el.draft.value);
+      el.approveBtn.textContent = "Copied ✓";
+      setTimeout(() => { el.approveBtn.textContent = "Copy to send"; }, 1200);
+    }
+  };
+</script>
+</body>
+</html>
